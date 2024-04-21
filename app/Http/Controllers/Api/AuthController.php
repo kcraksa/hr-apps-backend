@@ -8,6 +8,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\Auth;
+use App\Exceptions\DataNotFoundException;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerifiedEmail;
 
 class AuthController extends Controller
 {
@@ -46,11 +49,11 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
+            'nip' => 'required',
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($request->only('email', 'password'))) {
+        if (Auth::attempt($request->only('nip', 'password'))) {
             $user = Auth::user();
             $token = $user->createToken('authToken')->plainTextToken;
 
@@ -61,5 +64,21 @@ class AuthController extends Controller
         } else {
             return ApiResponse::error("Invalid Credential", 401);
         }
+    }
+
+    public function emailVerification(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'new_password' => 'required',
+            'confirm_new_password' => 'required|same:new_password',
+        ]);
+
+        $user = User::where("email", $request->email)->first();
+        if (!$user) {
+            throw new DataNotFoundException();
+        }
+
+        Mail::to($request->email)->send(new VerifiedEmail("123456"));
     }
 }
