@@ -12,7 +12,11 @@ class CityController extends Controller
 {
     public function index(Request $request)
     {
-        $data = City::where("province_id", $request->province_id)->get();
+        if ($request->province_id) {
+            $data = City::where("province_id", $request->province_id)->get();
+        } else {
+            $data = City::all();
+        }
 
         return ApiResponse::success($data, "Get data city success", 200);
     }

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Exceptions\DataNotFoundException;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\VerifiedEmail;
+use Ichtrojan\Otp\Otp;
 
 class AuthController extends Controller
 {
@@ -55,7 +56,15 @@ class AuthController extends Controller
 
         if (Auth::attempt($request->only('nip', 'password'))) {
             $user = Auth::user();
-            $token = $user->createToken('authToken')->plainTextToken;
+
+            $user->last_login = now();
+            $user->save();
+
+            if ($user->email_verified_at === null) {
+                $token = $user->createToken('emailVerificationToken', ['email-verification'])->plainTextToken;
+            } else {
+                $token = $user->createToken('authToken', ['apps'])->plainTextToken;
+            }
 
             return ApiResponse::success([
               'user' => $user,
@@ -78,7 +87,32 @@ class AuthController extends Controller
         if (!$user) {
             throw new DataNotFoundException();
         }
+        $otp = (new Otp)->generate($request->email, 'numeric', 6, 5);
 
-        Mail::to($request->email)->send(new VerifiedEmail("123456"));
+        Mail::to($request->email)->send(new VerifiedEmail($otp->token));
+
+        return ApiResponse::success(null, "Email has been sent");
+    }
+
+    public function emailOtpVerification(Request $request)
+    {
+        try {
+            $userInformation = $request->user();
+            $checkOtp = (new Otp)->validate($userInformation->email, $request->otp);
+
+            if ($checkOtp) {
+                $user = User::find($userInformation->id);
+                $token = $userInformation->createToken('authToken', ['apps'])->plainTextToken;
+
+                $userInformation->currentAccessToken()->delete();
+                return ApiResponse::success([
+                    'user' => $user,
+                    'token' => $token,
+                ], "Email has been verified");
+            }
+            return ApiResponse::error("Invalid Credential", 401);
+        } catch (\Throwable $th) {
+            return ApiResponse::error("Invalid Credential", 401);
+        }
     }
 }

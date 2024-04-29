@@ -4,16 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Subdistrict;
+use App\Models\BloodType;
 use App\Helpers\ApiResponse;
 use App\Exceptions\DataNotFoundException;
 
-class SubdistrictController extends Controller
+class BloodTypeController extends Controller
 {
     public function index(Request $request)
     {
-        $data = Subdistrict::where("district_id", $request->district_id)->get();
+        $data = BloodType::all();
 
-        return ApiResponse::success($data, "Get data subdistrict success", 200);
+        return ApiResponse::success($data, "Get data blood type success", 200);
     }
 }
