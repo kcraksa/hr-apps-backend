@@ -12,6 +12,9 @@ use App\Exceptions\DataNotFoundException;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\VerifiedEmail;
 use Ichtrojan\Otp\Otp;
+use App\Models\Module;
+use App\Models\FunctionModel;
+use App\Models\Role;
 
 class AuthController extends Controller
 {
@@ -56,6 +59,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($request->only('nip', 'password'))) {
             $user = Auth::user();
+            $roles = [];
 
             $user->last_login = now();
             $user->save();
@@ -66,8 +70,13 @@ class AuthController extends Controller
                 $token = $user->createToken('authToken', ['apps'])->plainTextToken;
             }
 
+            if ($user->is_document_complete == 1) {
+                $roles = $this->getUserRoles($user->id);
+            }
+
             return ApiResponse::success([
               'user' => $user,
+              'role' => $roles,
               'token' => $token,
             ], "Login successfull");
         } else {
@@ -107,6 +116,7 @@ class AuthController extends Controller
                 $userInformation->currentAccessToken()->delete();
                 return ApiResponse::success([
                     'user' => $user,
+                    'role' => $this->getUserRoles($user->id),
                     'token' => $token,
                 ], "Email has been verified");
             }
@@ -114,5 +124,21 @@ class AuthController extends Controller
         } catch (\Throwable $th) {
             return ApiResponse::error("Invalid Credential", 401);
         }
+    }
+
+    public function getUserRoles($user_id)
+    {
+        $modules = Module::whereHas('functions', function ($query) use ($user_id) {
+            $query->whereHas('role', function ($roleQuery) use ($user_id) {
+                $roleQuery->where('user_id', $user_id);
+            });
+        })->with(['functions' => function ($query) use ($user_id) {
+            $query->whereHas('role', function ($roleQuery) use ($user_id) {
+                $roleQuery->where('user_id', $user_id);
+            })->with(['role' => function ($query) use ($user_id) {
+                $query->where('user_id', $user_id);
+            }]);
+        }])->get();
+        return $modules;
     }
 }

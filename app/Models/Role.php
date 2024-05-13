@@ -6,14 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class FunctionModel extends Model
+class Role extends Model
 {
     use HasFactory;
 
-    protected $table = "functions";
-
-    public function Role(): HasOne
+    public function User(): HasOne
     {
-        return $this->hasOne(Role::class, "function_id", "id");
+        return $this->hasOne(User::class, "id", "user_id");
     }
 }

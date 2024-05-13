@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\MaritalStatusController;
 use App\Http\Controllers\Api\BankController;
 use App\Http\Controllers\Api\DriverLicenseTypeController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\MasterdataController;
 
 Route::prefix("v1")->group(function() {
     Route::post("/register", [AuthController::class, "register"]);
@@ -44,10 +45,14 @@ Route::prefix("v1")->group(function() {
         // Role
         Route::get("/modules", [RoleController::class, "getModule"]);
         Route::get("/functions/{module_id}", [RoleController::class, "getFunction"]);
+        Route::get("/user/role", [RoleController::class, "getUserRoles"]);
 
         // Employee
         Route::get("/employee/{nip}", [EmployeeController::class, "employeeByNip"]);
         Route::put("/employee/{nip}", [EmployeeController::class, "update"]);
+
+        // MasterData
+        Route::get("/master/scopes", [MasterdataController::class, "getScopes"]);
     });
 
     Route::middleware(['auth:sanctum', 'abilities:email-verification'])->group(function() {  

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Module;
 use App\Models\FunctionModel;
 use App\Helpers\ApiResponse;
+use Illuminate\Support\Facades\Auth;
 
 class RoleController extends Controller
 {
