@@ -12,6 +12,7 @@ class EmployeeAddress extends Model
 
     protected $fillable = [
         'nip',
+        'id_card',
         'identity_number',
         'address',
         'province_id',

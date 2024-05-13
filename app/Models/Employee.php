@@ -10,6 +10,18 @@ class Employee extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'fullname',
+        'nip',
+        'phone_number',
+        'office_place_id',
+        'department_id',
+        'section_id',
+        'position_id',
+        'superior_nip',
+        'level_id',
+    ];
+
     public function PlaceOffice(): HasOne
     {
         return $this->hasOne(PlaceOffice::class, "id", "office_place_id");
