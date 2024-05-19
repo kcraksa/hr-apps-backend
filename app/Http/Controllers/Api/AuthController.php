@@ -128,7 +128,7 @@ class AuthController extends Controller
 
     public function getUserRoles($user_id)
     {
-        $modules = Module::whereHas('functions', function ($query) use ($user_id) {
+        return Module::whereHas('functions', function ($query) use ($user_id) {
             $query->whereHas('role', function ($roleQuery) use ($user_id) {
                 $roleQuery->where('user_id', $user_id);
             });
@@ -139,6 +139,5 @@ class AuthController extends Controller
                 $query->where('user_id', $user_id);
             }]);
         }])->get();
-        return $modules;
     }
 }

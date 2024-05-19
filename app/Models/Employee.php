@@ -22,6 +22,11 @@ class Employee extends Model
         'level_id',
     ];
 
+    public function User(): HasOne
+    {
+        return $this->hasOne(User::class, "nip", "nip");
+    }
+
     public function PlaceOffice(): HasOne
     {
         return $this->hasOne(PlaceOffice::class, "id", "office_place_id");

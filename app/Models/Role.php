@@ -10,8 +10,28 @@ class Role extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'user_id',
+        'function_id',
+        'scope_id',
+        'create',
+        'read',
+        'update',
+        'delete'
+    ];
+
     public function User(): HasOne
     {
         return $this->hasOne(User::class, "id", "user_id");
+    }
+
+    public function FunctionModule(): HasOne
+    {
+        return $this->hasOne(FunctionModel::class, "id", "function_id");
+    }
+
+    public function Scope(): HasOne
+    {
+        return $this->hasOne(Scope::class, "id", "scope_id");
     }
 }

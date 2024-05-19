@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\BankController;
 use App\Http\Controllers\Api\DriverLicenseTypeController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\MasterdataController;
+use App\Http\Controllers\Api\CompanyController;
 
 Route::prefix("v1")->group(function() {
     Route::post("/register", [AuthController::class, "register"]);
@@ -46,6 +47,8 @@ Route::prefix("v1")->group(function() {
         Route::get("/modules", [RoleController::class, "getModule"]);
         Route::get("/functions/{module_id}", [RoleController::class, "getFunction"]);
         Route::get("/user/role", [RoleController::class, "getUserRoles"]);
+        Route::post("/role", [RoleController::class, "store"]);
+        Route::get("/role/search/employee", [RoleController::class, "searchEmployee"]);
 
         // Employee
         Route::get("/employee/{nip}", [EmployeeController::class, "employeeByNip"]);
@@ -53,6 +56,12 @@ Route::prefix("v1")->group(function() {
 
         // MasterData
         Route::get("/master/scopes", [MasterdataController::class, "getScopes"]);
+
+        // Company
+        Route::get("/company", [CompanyController::class, "index"]);
+        Route::post("/company", [CompanyController::class, "create"]);
+        Route::patch("/update-status/{code}", [CompanyController::class, "updateStatus"]);
+        Route::delete("/company/{code}", [CompanyController::class, "delete"]);
     });
 
     Route::middleware(['auth:sanctum', 'abilities:email-verification'])->group(function() {  
