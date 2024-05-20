@@ -12,6 +12,10 @@ class FunctionModel extends Model
 
     protected $table = "functions";
 
+    protected $fillable = [
+        'id_module', 'name', 'url'
+    ];
+
     public function Role(): HasOne
     {
         return $this->hasOne(Role::class, "function_id", "id");

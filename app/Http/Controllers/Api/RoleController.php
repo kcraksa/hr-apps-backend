@@ -44,6 +44,23 @@ class RoleController extends Controller
         return ApiResponse::success($data, "Get data employee success", 200);
     }
 
+    public function createFunction(Request $request)
+    {
+        $request->validate([
+            'id_module' => 'required',
+            'name' => 'required',
+            'url' => 'required'
+        ]);
+
+        $data = FunctionModel::create([
+            'id_module' => $request->id_module,
+            'name' => $request->name,
+            'url' => $request->url
+        ]);
+
+        return ApiResponse::success($data, 'Success create new function', 201);
+    }
+
     public function store(Request $request)
     {
         $request->validate([

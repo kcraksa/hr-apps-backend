@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\DriverLicenseTypeController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\MasterdataController;
 use App\Http\Controllers\Api\CompanyController;
+use App\Http\Controllers\Api\DivisionController;
 
 Route::prefix("v1")->group(function() {
     Route::post("/register", [AuthController::class, "register"]);
@@ -49,6 +50,7 @@ Route::prefix("v1")->group(function() {
         Route::get("/user/role", [RoleController::class, "getUserRoles"]);
         Route::post("/role", [RoleController::class, "store"]);
         Route::get("/role/search/employee", [RoleController::class, "searchEmployee"]);
+        Route::post("/role/function/create", [RoleController::class, "createFunction"]);
 
         // Employee
         Route::get("/employee/{nip}", [EmployeeController::class, "employeeByNip"]);
@@ -62,6 +64,13 @@ Route::prefix("v1")->group(function() {
         Route::post("/company", [CompanyController::class, "create"]);
         Route::patch("/update-status/{code}", [CompanyController::class, "updateStatus"]);
         Route::delete("/company/{code}", [CompanyController::class, "delete"]);
+
+        // Division
+        Route::get("/division", [DivisionController::class, "index"]);
+        Route::get("/division/{id}", [DivisionController::class, "findById"]);
+        Route::post("/division", [DivisionController::class, "store"]);
+        Route::put("/division/{id}", [DivisionController::class, "update"]);
+        Route::delete("/division/{id}", [DivisionController::class, "delete"]);
     });
 
     Route::middleware(['auth:sanctum', 'abilities:email-verification'])->group(function() {  
