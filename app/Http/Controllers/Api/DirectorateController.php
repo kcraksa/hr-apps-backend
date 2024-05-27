@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Position;
+use App\Models\Directorate;
 use App\Helpers\ApiResponse;
 use App\Exceptions\DataNotFoundException;
 
-class PositionController extends Controller
+class DirectorateController extends Controller
 {
     public function index(Request $request)
     {
@@ -16,56 +16,56 @@ class PositionController extends Controller
         $search = $request->query('search', '');
         $page = $request->query('page', 1);
 
-        // Fetch positions with pagination and search
-        $positions = Position::with(["Team"])->when($search, function($query, $search) {
+        // Fetch divisions with pagination and search
+        $data = Directorate::with(["Company"])->when($search, function($query, $search) {
                         return $query->where('name', 'LIKE', "%{$search}%");
                     })
                     ->paginate(10, ['*'], 'page', $page);
 
-        return ApiResponse::success($positions, "success get data position", 200);
+        return ApiResponse::success($data, "success get data business unit", 200);
     }
 
     public function findById($id)
     {
-        $exists = Position::find($id);
+        $exists = Directorate::find($id);
         if (!$exists) {
             throw new DataNotFoundException();
         }
 
         $exists->first();
-        return ApiResponse::success($exists, "success get position", 200);
+        return ApiResponse::success($exists, "success get business unit", 200);
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required',
-            'team_id' => 'required'
+            'company_id' => 'required'
         ]);
 
-        $div = Position::create(["name" => $request->name, "team_id" => $request->team_id]);
-        return ApiResponse::success($div, "success create new position", 201);
+        $div = Directorate::create(["name" => $request->name, "company_id" => $request->company_id]);
+        return ApiResponse::success($div, "success create new business unit", 201);
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
             'name' => 'required',
-            'team_id' => 'required'
+            'company_id' => 'required'
         ]);
 
-        $div = Position::where("id", $id)->update(["name" => $request->name,  "team_id" => $request->team_id]);
-        return ApiResponse::success($div, "success update position", 200);
+        $div = Directorate::where("id", $id)->update(["name" => $request->name, "company_id" => $request->company_id]);
+        return ApiResponse::success($div, "success update business unit", 200);
     }
 
     public function delete($id)
     {
-        $exists = Position::find($id);
+        $exists = Directorate::find($id);
         if (!$exists) {
             throw new DataNotFoundException();
         }
 
         $exists->delete();
-        return ApiResponse::success(null, "delete position success", 200);
+        return ApiResponse::success(null, "delete business unit success", 200);
     }
 }

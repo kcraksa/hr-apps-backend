@@ -6,16 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class Division extends Model
+class Directorate extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'name'
+        'name', 'company_id'
     ];
 
-    public function Directorate(): HasOne
+    public function Company(): HasOne
     {
-        return $this->hasOne(Directorate::class, "id", "directorate_id");
+        return $this->hasOne(Company::class, "id", "company_id");
     }
 }

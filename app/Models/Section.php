@@ -4,8 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Section extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['name', 'department_id'];
+
+    public function Department(): HasOne
+    {
+        return $this->hasOne(Department::class, "id", "department_id");
+    }
 }

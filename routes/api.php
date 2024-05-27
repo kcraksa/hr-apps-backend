@@ -23,15 +23,14 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\MasterdataController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\DivisionController;
+use App\Http\Controllers\Api\TeamController;
+use App\Http\Controllers\Api\DirectorateController;
 
 Route::prefix("v1")->group(function() {
     Route::post("/register", [AuthController::class, "register"]);
     Route::post("/login", [AuthController::class, "login"]);
 
-    Route::middleware(['auth:sanctum', 'abilities:apps'])->group(function() {   
-        Route::get("/departments", [DepartmentController::class, "index"]);
-        Route::get("/positions", [PositionController::class, "index"]);
-        Route::get("/sections", [SectionController::class, "index"]);
+    Route::middleware(['auth:sanctum', 'abilities:apps'])->group(function() {
         Route::get("/office-places", [OfficePlaceController::class, "index"]);
         Route::get("/levels", [LevelController::class, "index"]);
         Route::get("/provinces", [ProvinceController::class, "index"]);
@@ -71,6 +70,41 @@ Route::prefix("v1")->group(function() {
         Route::post("/division", [DivisionController::class, "store"]);
         Route::put("/division/{id}", [DivisionController::class, "update"]);
         Route::delete("/division/{id}", [DivisionController::class, "delete"]);
+
+        // Teams
+        Route::get("/teams", [TeamController::class, "index"]);
+        Route::get("/team/{id}", [TeamController::class, "findById"]);
+        Route::post("/team", [TeamController::class, "store"]);
+        Route::put("/team/{id}", [TeamController::class, "update"]);
+        Route::delete("/team/{id}", [TeamController::class, "delete"]);
+
+        // Directorate
+        Route::get("/directorates", [DirectorateController::class, "index"]);
+        Route::get("/directorate/{id}", [DirectorateController::class, "findById"]);
+        Route::post("/directorate", [DirectorateController::class, "store"]);
+        Route::put("/directorate/{id}", [DirectorateController::class, "update"]);
+        Route::delete("/directorate/{id}", [DirectorateController::class, "delete"]);
+
+        // Department
+        Route::get("/departments", [DepartmentController::class, "index"]);
+        Route::get("/department/{id}", [DepartmentController::class, "findById"]);
+        Route::post("/department", [DepartmentController::class, "store"]);
+        Route::put("/department/{id}", [DepartmentController::class, "update"]);
+        Route::delete("/department/{id}", [DepartmentController::class, "delete"]);
+
+        // Section
+        Route::get("/sections", [SectionController::class, "index"]);
+        Route::get("/section/{id}", [SectionController::class, "findById"]);
+        Route::post("/section", [SectionController::class, "store"]);
+        Route::put("/section/{id}", [SectionController::class, "update"]);
+        Route::delete("/section/{id}", [SectionController::class, "delete"]);
+
+        // Position
+        Route::get("/positions", [PositionController::class, "index"]);
+        Route::get("/position/{id}", [PositionController::class, "findById"]);
+        Route::post("/position", [PositionController::class, "store"]);
+        Route::put("/position/{id}", [PositionController::class, "update"]);
+        Route::delete("/position/{id}", [PositionController::class, "delete"]);
     });
 
     Route::middleware(['auth:sanctum', 'abilities:email-verification'])->group(function() {  

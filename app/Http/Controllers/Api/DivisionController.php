@@ -17,7 +17,7 @@ class DivisionController extends Controller
         $page = $request->query('page', 1);
 
         // Fetch divisions with pagination and search
-        $divisions = Division::when($search, function($query, $search) {
+        $divisions = Division::with(["Directorate"])->when($search, function($query, $search) {
                         return $query->where('name', 'LIKE', "%{$search}%");
                     })
                     ->paginate(10, ['*'], 'page', $page);
@@ -39,20 +39,22 @@ class DivisionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required'
+            'name' => 'required',
+            'directorate_id' => 'required'
         ]);
 
-        $div = Division::create(["name" => $request->name]);
+        $div = Division::create(["name" => $request->name, "directorate_id" => $request->directorate_id]);
         return ApiResponse::success($div, "success create new division", 201);
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required'
+            'name' => 'required',
+            'directorate_id' => 'required'
         ]);
 
-        $div = Division::where("id", $id)->update(["name" => $request->name]);
+        $div = Division::where("id", $id)->update(["name" => $request->name,  "directorate_id" => $request->directorate_id]);
         return ApiResponse::success($div, "success update division", 200);
     }
 
