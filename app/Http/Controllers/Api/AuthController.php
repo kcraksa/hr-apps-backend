@@ -76,7 +76,6 @@ class AuthController extends Controller
 
             return ApiResponse::success([
               'user' => $user,
-              'role' => $roles,
               'token' => $token,
             ], "Login successfull");
         } else {

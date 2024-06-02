@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Team extends Model
 {
@@ -12,4 +13,9 @@ class Team extends Model
     protected $fillable = [
         'name', 'section_id'
     ];
+
+    public function Section(): HasOne
+    {
+        return $this->hasOne(Section::class, "id", "section_id");
+    }
 }

@@ -13,11 +13,13 @@ class Level extends Model
         'title',
         'levelA',
         'levelN',
-        'levelE',
+        'levelEm',
         'group',
         'health_balance',
         'meal_allowance',
         'transportation_fee',
-        'status'
+        'status',
+        'specialist',
+        'executive'
     ];
 }

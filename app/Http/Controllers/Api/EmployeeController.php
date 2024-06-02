@@ -20,6 +20,26 @@ use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
+    public function index(Request $request)
+    {
+        // Get search query
+        $search = $request->query('search', '');
+        $page = $request->query('page', 1);
+
+        // Fetch divisions with pagination and search
+        $data = Employee::with([
+            "User",
+            "Position",
+            "Level",
+            "Position.Team",
+            "Position.Team.Section",
+            "Position.Team.Section.Department",
+            "Position.Team.Section.Department.Division",
+        ])->paginate(10, ['*'], 'page', $page);
+
+        return ApiResponse::success($data, "success get data employee", 200);
+    }
+
     public function employeeByNip(Request $request, string $nip)
     {
         $data = Employee::with([

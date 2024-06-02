@@ -29,7 +29,10 @@ class RoleController extends Controller
 
     public function searchEmployee(Request $request)
     {
-        $data = Employee::with(['user'])->where("fullname", $request->search)->orWhere("nip", $request->search)->first();
+        $data = Employee::with(['User' => function($query) use ($request) {
+            $query->where('name', '=', $request->search)
+                  ->orWhere('nip', '=', $request->search);
+        }])->first();
         $roleAssigned = Role::with("FunctionModule")->where("user_id", $data->user->id)->get();
 
         $functionNames = [];
@@ -39,7 +42,7 @@ class RoleController extends Controller
 
         $data->role_assigned = count($roleAssigned);
         $data->function = $functionNames;
-        $data->roles = $this->getUserRoles($data->user->id);
+        $data->roles = $this->getUserRoleByUserId($data->user->id);
 
         return ApiResponse::success($data, "Get data employee success", 200);
     }
@@ -93,7 +96,7 @@ class RoleController extends Controller
         return ApiResponse::success(null, "Role has been updated");
     }
 
-    public function getUserRoles($user_id)
+    public function getUserRoleByUserId($user_id)
     {
         return Module::whereHas('functions', function ($query) use ($user_id) {
             $query->whereHas('role', function ($roleQuery) use ($user_id) {
@@ -106,5 +109,23 @@ class RoleController extends Controller
                 $query->where('user_id', $user_id)->with(['scope']);
             }]);
         }])->get();
+    }
+
+    public function getUserRoles()
+    {
+        $user_id = Auth()->user()->id;
+        $roles = Module::whereHas('functions', function ($query) use ($user_id) {
+            $query->whereHas('role', function ($roleQuery) use ($user_id) {
+                $roleQuery->where('user_id', $user_id);
+            });
+        })->with(['functions' => function ($query) use ($user_id) {
+            $query->whereHas('role', function ($roleQuery) use ($user_id) {
+                $roleQuery->where('user_id', $user_id);
+            })->with(['role' => function ($query) use ($user_id) {
+                $query->where('user_id', $user_id)->with(['scope']);
+            }]);
+        }])->get();
+
+        return ApiResponse::success($roles, "Get roles success");
     }
 }

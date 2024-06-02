@@ -11,35 +11,20 @@ class Employee extends Model
     use HasFactory;
 
     protected $fillable = [
-        'fullname',
-        'nip',
-        'phone_number',
-        'office_place_id',
-        'department_id',
-        'section_id',
+        'user_id',
+        'join_date',
+        'contract_start_date',
+        'contract_end_date',
+        'fixed_date',
+        'employment_status',
         'position_id',
-        'superior_nip',
+        'group_absent_id',
         'level_id',
     ];
 
     public function User(): HasOne
     {
-        return $this->hasOne(User::class, "nip", "nip");
-    }
-
-    public function PlaceOffice(): HasOne
-    {
-        return $this->hasOne(PlaceOffice::class, "id", "office_place_id");
-    }
-
-    public function Department(): HasOne
-    {
-        return $this->hasOne(Department::class, "id", "department_id");
-    }
-
-    public function Section(): HasOne
-    {
-        return $this->hasOne(Section::class, "id", "section_id");
+        return $this->hasOne(User::class, "id", "user_id");
     }
 
     public function Position(): HasOne

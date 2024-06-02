@@ -39,21 +39,60 @@ class LevelController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required',
+            'levelA' => 'nullable|string|max:255',
+            'levelN' => 'nullable|string|max:255',
+            'levelEm' => 'nullable|string|max:255',
+            'group' => 'nullable|string|max:255',
+            'specialist' => 'nullable|string|max:255',
+            'executive' => 'nullable|string|max:255',
+            'health_balance' => 'required|string|min:0',
+            'meal_allowance' => 'required|string|min:0',
+            'transportation_fee' => 'required|string|min:0',
         ]);
 
-        $div = Level::create(["name" => $request->name, "directorate_id" => $request->directorate_id]);
+        $mappedData = $request->only([
+            'levelA',
+            'levelN',
+            'levelEm',
+            'group',
+            'specialist',
+            'executive',
+            'health_balance',
+            'meal_allowance',
+            'transportation_fee'
+        ]);
+
+        $div = Level::create([...$mappedData, "status" => 1]);
         return ApiResponse::success($div, "success create new level", 201);
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required',
-            'directorate_id' => 'required'
+            'levelA' => 'nullable|string|max:255',
+            'levelN' => 'nullable|string|max:255',
+            'levelEm' => 'nullable|string|max:255',
+            'group' => 'nullable|string|max:255',
+            'specialist' => 'nullable|string|max:255',
+            'executive' => 'nullable|string|max:255',
+            'health_balance' => 'required|min:0',
+            'meal_allowance' => 'required|min:0',
+            'transportation_fee' => 'required|min:0',
         ]);
 
-        $div = Level::where("id", $id)->update(["name" => $request->name,  "directorate_id" => $request->directorate_id]);
+        $mappedData = $request->only([
+            'levelA',
+            'levelN',
+            'levelEm',
+            'group',
+            'specialist',
+            'executive',
+            'health_balance',
+            'meal_allowance',
+            'transportation_fee'
+        ]);
+
+        $div = Level::where("id", $id)->update($mappedData);
         return ApiResponse::success($div, "success update level", 200);
     }
 
