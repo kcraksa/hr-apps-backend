@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
 use App\Models\Employee;
 use App\Models\EmployeeAddress;
 use App\Models\EmployeePersonalData;
@@ -13,10 +14,13 @@ use App\Models\EmployeeBank;
 use App\Models\EmployeeDriverLicense;
 use App\Models\EmployeeDocument;
 use App\Models\EmployeeVerklaring;
+use App\Models\UserLeaveData;
+use App\Models\UserHealthBalance;
 use App\Helpers\ApiResponse;
 use App\Helpers\GeneralHelper;
 use App\Exceptions\DataNotFoundException;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
 
 class EmployeeController extends Controller
 {
@@ -59,6 +63,68 @@ class EmployeeController extends Controller
         }
 
         return ApiResponse::success($data, "Get data employee success", 200);
+    }
+
+    public function create(Request $request)
+    {
+        $request->validate([
+            "name" => "required",
+            "employment_status" => "required",
+            "phone" => "required",
+            "email" => "email|required",
+            "position_id" => "required",
+            "level_id" => "required",
+            "superior_1" => "required",
+            "join_date" => "required",
+            "contract_start_date" => "required",
+            "contract_end_date" => "required",
+            "fixed_date" => "required",
+        ]);
+
+        // insert ke table user
+        $defaultPassword = "12345678";
+        $prefixNIP = "HR23";
+
+        $user = User::create([
+            "name" => $request->name,
+            "phone" => $request->phone,
+            "email" => $request->email,
+            "password" => Hash::make($defaultPassword),
+            "nip" => $prefixNIP.rand(1000, 9999)
+        ]);
+
+        Employee::create([
+            "user_id" => $user->id,
+            "join_date" => $request->join_date,
+            "contract_start_date" => $request->contract_start_date,
+            "contract_end_date" => $request->contract_end_date,
+            "fixed_date" => $request->fixed_date,
+            "position_id" => $request->position_id,
+            "level_id" => $request->level_id,
+            "employment_status" => $request->employment_status,
+            // "superior_id" => $request->superior_1
+        ]);
+
+        // create leave and health balance default
+        UserLeaveData::create([
+            "user_id" => $user->id,
+            "year" => date("Y"),
+            "leave_balance" => 0,
+            "expired_balance" => 0,
+            "total_balance" => 0,
+            "status" => 1
+        ]);
+
+        UserHealthBalance::create([
+            "user_id" => $user->id,
+            "year" => date("Y"),
+            "health_balance" => 0,
+            "total_balance" => 0,
+            "balance_update" => date("Y-m-d"),
+            "status" => 1
+        ]);
+
+        return ApiResponse::success(null, "create new employee success", 201);
     }
 
     public function update(Request $request, string $nip)

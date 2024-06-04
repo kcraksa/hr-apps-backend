@@ -28,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function(DataNotFoundException $e) {
+            dd($e);
             return ApiResponse::error("Data Not Found", 404);
         });
 

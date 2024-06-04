@@ -55,6 +55,7 @@ Route::prefix("v1")->group(function() {
         // Employee
         Route::get("/employees", [EmployeeController::class, "index"]);
         Route::get("/employee/{nip}", [EmployeeController::class, "employeeByNip"]);
+        Route::post("/employee/create", [EmployeeController::class, "create"]);
         Route::put("/employee/{nip}", [EmployeeController::class, "update"]);
 
         // MasterData
@@ -107,6 +108,7 @@ Route::prefix("v1")->group(function() {
         Route::post("/position", [PositionController::class, "store"]);
         Route::put("/position/{id}", [PositionController::class, "update"]);
         Route::delete("/position/{id}", [PositionController::class, "delete"]);
+        Route::get("/position/employee/dropdown", [MasterdataController::class, "getPositionEmployee"]);
 
         // Position
         Route::get("/levels", [LevelController::class, "index"]);
