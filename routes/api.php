@@ -26,6 +26,8 @@ use App\Http\Controllers\Api\DivisionController;
 use App\Http\Controllers\Api\TeamController;
 use App\Http\Controllers\Api\DirectorateController;
 use App\Http\Controllers\Api\GroupAbsentController;
+use App\Http\Controllers\Api\RelationController;
+use App\Http\Controllers\Api\MasterLeaveController;
 
 Route::prefix("v1")->group(function() {
     Route::post("/register", [AuthController::class, "register"]);
@@ -55,6 +57,7 @@ Route::prefix("v1")->group(function() {
         // Employee
         Route::get("/employees", [EmployeeController::class, "index"]);
         Route::get("/employee/{nip}", [EmployeeController::class, "employeeByNip"]);
+        Route::get("/employee-dropdown", [EmployeeController::class, "dropdown"]);
         Route::post("/employee/create", [EmployeeController::class, "create"]);
         Route::put("/employee/{nip}", [EmployeeController::class, "update"]);
 
@@ -117,12 +120,19 @@ Route::prefix("v1")->group(function() {
         Route::put("/level/{id}", [LevelController::class, "update"]);
         Route::delete("/level/{id}", [LevelController::class, "delete"]);
 
-        // Position
+        // Group Absent
         Route::get("/group-absents", [GroupAbsentController::class, "index"]);
         Route::get("/group-absent/{id}", [GroupAbsentController::class, "findById"]);
         Route::post("/group-absent", [GroupAbsentController::class, "store"]);
         Route::put("/group-absent/{id}", [GroupAbsentController::class, "update"]);
         Route::delete("/group-absent/{id}", [GroupAbsentController::class, "delete"]);
+
+        // Relation
+        Route::get("/relations", [RelationController::class, "index"]);
+        Route::post("/relation", [RelationController::class, "create"]);
+
+        // MasterLeave
+        Route::get("/master-leave", [MasterLeaveController::class, "index"]);
     });
 
     Route::middleware(['auth:sanctum', 'abilities:email-verification'])->group(function() {  

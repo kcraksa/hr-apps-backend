@@ -44,6 +44,23 @@ class EmployeeController extends Controller
         return ApiResponse::success($data, "success get data employee", 200);
     }
 
+    public function dropdown(Request $request)
+    {
+        $search = $request->query('search', '');
+        // Fetch divisions with pagination and search
+        $data = Employee::with([
+            "User"
+        ])
+        ->when($search, function($query, $search) {
+            return $query->whereHas('User', function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%");
+            });
+        })
+        ->paginate(10, ['*'], 'page', 1);
+
+        return ApiResponse::success($data, "success get data employee", 200);
+    }
+
     public function employeeByNip(Request $request, string $nip)
     {
         $data = Employee::with([

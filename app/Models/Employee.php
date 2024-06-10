@@ -51,4 +51,14 @@ class Employee extends Model
     {
         return $this->hasOne(EmployeePersonalData::class, "nip", "nip");
     }
+
+    public function HealthBalance(): HasOne
+    {
+        return $this->hasOne(UserHealthBalance::class, "user_id", "user_id");
+    }
+
+    public function LeaveData(): HasOne
+    {
+        return $this->hasOne(UserLeaveData::class, "user_id", "user_id");
+    }
 }
