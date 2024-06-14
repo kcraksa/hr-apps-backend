@@ -82,6 +82,23 @@ class EmployeeController extends Controller
         return ApiResponse::success($data, "Get data employee success", 200);
     }
 
+    public function employeeByID(Request $request, string $id)
+    {
+        $data = User::with([
+            "Employee",
+            "Employee.Position",
+            "Employee.Position.Team",
+            "Employee.Position.Team.Section",
+            "Employee.Position.Team.Section.Department",
+            "Employee.Level",
+        ])->where("id", $id)->first();
+        if (!$data) {
+            throw new DataNotFoundException();
+        }
+
+        return ApiResponse::success($data, "Get data employee success", 200);
+    }
+
     public function create(Request $request)
     {
         $request->validate([

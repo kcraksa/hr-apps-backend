@@ -56,7 +56,7 @@ Route::prefix("v1")->group(function() {
 
         // Employee
         Route::get("/employees", [EmployeeController::class, "index"]);
-        Route::get("/employee/{nip}", [EmployeeController::class, "employeeByNip"]);
+        Route::get("/employee/{id}", [EmployeeController::class, "employeeByID"]);
         Route::get("/employee-dropdown", [EmployeeController::class, "dropdown"]);
         Route::post("/employee/create", [EmployeeController::class, "create"]);
         Route::put("/employee/{nip}", [EmployeeController::class, "update"]);
