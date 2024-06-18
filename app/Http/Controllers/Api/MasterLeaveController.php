@@ -48,4 +48,28 @@ class MasterLeaveController extends Controller
 
         return ApiResponse::success($datas, "success get data", 200);
     }
+
+    public function getLeaveandHealthBalanceByUserId(string $user_id)
+    {
+        try {
+            $currentYear = date("Y");
+            $leaveBalance = UserLeaveData::where("user_id", "=", $user_id)
+                                ->where("year", "=", $currentYear)
+                                ->orWhere("year", "=", $currentYear - 1)
+                                ->get();
+
+            $healthBalance = UserHealthBalance::where("user_id", "=", $user_id)
+                                ->where("year", "=", $currentYear)
+                                ->first();
+
+            $data = [
+                "leave_balance" => $leaveBalance,
+                "health_balance" => $healthBalance
+            ];
+
+            return ApiResponse::success($data, "success get leave and health remaining", 200);
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+    }
 }

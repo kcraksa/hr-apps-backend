@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\DirectorateController;
 use App\Http\Controllers\Api\GroupAbsentController;
 use App\Http\Controllers\Api\RelationController;
 use App\Http\Controllers\Api\MasterLeaveController;
+use App\Http\Controllers\Api\PermissionController;
 
 Route::prefix("v1")->group(function() {
     Route::post("/register", [AuthController::class, "register"]);
@@ -133,6 +134,10 @@ Route::prefix("v1")->group(function() {
 
         // MasterLeave
         Route::get("/master-leave", [MasterLeaveController::class, "index"]);
+        Route::get("/leave-health-balance/user/{id}", [MasterLeaveController::class, "getLeaveandHealthBalanceByUserId"]);
+
+        // Permission
+        Route::get("/permissions", [PermissionController::class, "index"]);
     });
 
     Route::middleware(['auth:sanctum', 'abilities:email-verification'])->group(function() {  
