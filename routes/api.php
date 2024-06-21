@@ -134,10 +134,13 @@ Route::prefix("v1")->group(function() {
 
         // MasterLeave
         Route::get("/master-leave", [MasterLeaveController::class, "index"]);
+        Route::put("/update/leave-balance/{id}", [MasterLeaveController::class, "updateLeaveBalance"]);
+        Route::put("/update/health-balance/{id}", [MasterLeaveController::class, "updateHealthBalance"]);
         Route::get("/leave-health-balance/user/{id}", [MasterLeaveController::class, "getLeaveandHealthBalanceByUserId"]);
 
         // Permission
         Route::get("/permissions", [PermissionController::class, "index"]);
+        Route::post("/permission", [PermissionController::class, "create"]);
     });
 
     Route::middleware(['auth:sanctum', 'abilities:email-verification'])->group(function() {  
