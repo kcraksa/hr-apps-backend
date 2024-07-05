@@ -9,6 +9,7 @@ use App\Models\UserLeaveData;
 use App\Models\PermissionDate;
 use App\Models\PermissionDocument;
 use App\Models\PermissionSick;
+use App\Models\Relation;
 use App\Helpers\ApiResponse;
 use App\Helpers\GeneralHelper;
 use Illuminate\Support\Facades\Storage;
@@ -131,5 +132,19 @@ class PermissionController extends Controller
         }
 
         return ApiResponse::success(null, "success create permission", 201);
+    }
+
+    public function indexPermissionAs(Request $request)
+    {
+        // $user_id = Auth()->user()->id;
+        $relations = Relation::select("employee_id")->where("lead_id", Auth()->user()->id)->get()->pluck('employee_id');
+        $page = $request->query('page', 1);
+
+        // Fetch divisions with pagination and search
+        $permission = Permission::with("PermissionDate")->whereIn("user_id", $relations)
+                        ->orderBy("id", "DESC")
+                        ->paginate(10, ['*'], 'page', $page);
+
+        return ApiResponse::success($permission, "success get data permission", 200);
     }
 }

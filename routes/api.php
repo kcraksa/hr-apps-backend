@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\GroupAbsentController;
 use App\Http\Controllers\Api\RelationController;
 use App\Http\Controllers\Api\MasterLeaveController;
 use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\ClaimController;
 
 Route::prefix("v1")->group(function() {
     Route::post("/register", [AuthController::class, "register"]);
@@ -61,6 +62,7 @@ Route::prefix("v1")->group(function() {
         Route::get("/employee-dropdown", [EmployeeController::class, "dropdown"]);
         Route::post("/employee/create", [EmployeeController::class, "create"]);
         Route::put("/employee/{nip}", [EmployeeController::class, "update"]);
+        Route::get("/subordinate", [EmployeeController::class, "getUsersByLeadId"]);
 
         // MasterData
         Route::get("/master/scopes", [MasterdataController::class, "getScopes"]);
@@ -141,6 +143,14 @@ Route::prefix("v1")->group(function() {
         // Permission
         Route::get("/permissions", [PermissionController::class, "index"]);
         Route::post("/permission", [PermissionController::class, "create"]);
+        Route::get("/permissions-as", [PermissionController::class, "indexPermissionAs"]);
+
+        // Claim
+        Route::get("/claims", [ClaimController::class, "index"]);
+        Route::get("/claim-as", [ClaimController::class, "indexAs"]);
+        Route::post("/claim", [ClaimController::class, "store"]);
+        Route::put("/claim/{id}", [ClaimController::class, "update"]);
+        Route::delete("/claim/{id}", [ClaimController::class, "delete"]);
     });
 
     Route::middleware(['auth:sanctum', 'abilities:email-verification'])->group(function() {  

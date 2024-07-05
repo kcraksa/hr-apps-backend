@@ -16,11 +16,13 @@ use App\Models\EmployeeDocument;
 use App\Models\EmployeeVerklaring;
 use App\Models\UserLeaveData;
 use App\Models\UserHealthBalance;
+use App\Models\Relation;
 use App\Helpers\ApiResponse;
 use App\Helpers\GeneralHelper;
 use App\Exceptions\DataNotFoundException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class EmployeeController extends Controller
 {
@@ -418,4 +420,28 @@ class EmployeeController extends Controller
             return ApiResponse::error("Internal Server Error");
         }
     }
+
+    public function getUsersByLeadId(Request $request)
+    {
+        $leadId = Auth::user()->id;
+        $search = $request->query('search', '');
+
+        // Fetch relations where lead_id is 1
+        $relations = Relation::with(['User'])->where('lead_id', $leadId)->get();
+
+        // Extract user IDs from relations
+        $userIds = $relations->pluck('employee_id')->toArray();
+
+        // Fetch users based on extracted user IDs and filter by name or nip
+        $users = User::whereIn('id', $userIds)
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                        ->orWhere('nip', 'LIKE', "%{$search}%");
+                });
+            })
+            ->get();
+
+        return ApiResponse::success($users, "success get data employee", 200);
+    }  
 }
