@@ -30,6 +30,8 @@ use App\Http\Controllers\Api\RelationController;
 use App\Http\Controllers\Api\MasterLeaveController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\ClaimController;
+use App\Http\Controllers\Api\EvaluationController;
+use App\Http\Controllers\Api\AttendProblemController;
 
 Route::prefix("v1")->group(function() {
     Route::post("/register", [AuthController::class, "register"]);
@@ -144,13 +146,28 @@ Route::prefix("v1")->group(function() {
         Route::get("/permissions", [PermissionController::class, "index"]);
         Route::post("/permission", [PermissionController::class, "create"]);
         Route::get("/permissions-as", [PermissionController::class, "indexPermissionAs"]);
+        Route::get("/approval/permission/list", [PermissionController::class, "approval_list"]);
+        Route::post("/approval/permission", [PermissionController::class, "approval"]);
 
         // Claim
         Route::get("/claims", [ClaimController::class, "index"]);
+        Route::get("/claim/{id}", [ClaimController::class, "show"]);
         Route::get("/claim-as", [ClaimController::class, "indexAs"]);
         Route::post("/claim", [ClaimController::class, "store"]);
         Route::put("/claim/{id}", [ClaimController::class, "update"]);
         Route::delete("/claim/{id}", [ClaimController::class, "delete"]);
+        Route::post("/approval/claim/{id}", [ClaimController::class, "approval"]);
+
+        // Evaluation
+        Route::get("/evaluations", [EvaluationController::class, "index"]);
+        Route::post("/evaluation", [EvaluationController::class, "store"]);
+
+        // Attend Problem
+        Route::get("/attend-problems", [AttendProblemController::class, "index"]);
+        Route::post("/attend-problem", [AttendProblemController::class, "store"]);
+        Route::get("/attend-problem/{id}", [AttendProblemController::class, "show"]);
+        Route::put("/attend-problem/{id}", [AttendProblemController::class, "update"]);
+        Route::delete("/attend-problem/{id}", [AttendProblemController::class, "destroy"]);
     });
 
     Route::middleware(['auth:sanctum', 'abilities:email-verification'])->group(function() {  

@@ -37,6 +37,22 @@ class ClaimController extends Controller
         return ApiResponse::success($claims, "success get claims data");
     }
 
+    // create function to get single claim data based on Models/Claim.php
+    // return single claim data by json response with ApiResponse class
+    public function show($id)
+    {
+        // get single claim data based on id
+        $claim = Claim::with(['user', 'attachments'])->findOrFail($id);
+
+        // if claim data not found, return error response with ApiResponse class
+        if (!$claim) {
+            return ApiResponse::error(null, "claim data not found", 404);
+        }
+
+        // return single claim data by json response with ApiResponse class
+        return ApiResponse::success($claim, "success get single claim data");
+    }
+
     // create function to store new claim data based on Models/Claim.php
     // return new claim data by json response with ApiResponse class
     public function store(Request $request)
@@ -76,11 +92,12 @@ class ClaimController extends Controller
     {
         // validate request data
         $request->validate([
+            'user_id' => 'required|exists:users,id',
             'date' => 'required|date',
             'type' => 'required|string',
-            'category' => 'required|string',
+            'category' => 'string|required_if:type,Health Claim,',
             'amount' => 'required|numeric',
-            'description' => 'required|string',
+            'description' => 'string|required_if:type,Fund Request Claim,Receipt',
         ]);
 
         // get claim data based on id
@@ -88,6 +105,18 @@ class ClaimController extends Controller
 
         // update claim data based on request data
         $claim->update($request->all());
+
+        // check if attachment is posted
+        if ($request->attachment) {
+
+            // update employee address
+            $file = GeneralHelper::base64Decode($request->attachment);
+            $filename = 'upload/claim/'.strtolower(str_replace(' ', '-', $request->type)).'/'.$request->user_id.'/'.GeneralHelper::generateFilename($request->attachment, 'attachment');
+            $filepath = Storage::disk('local')->put($filename, $file);
+
+            // save the attachment path to the ClaimAttachment table
+            $claim->attachments()->updateOrCreate(['claim_id' => $claim->id], ['attachment' => $filename]);
+        }
 
         // return updated claim data by json response with ApiResponse class
         return ApiResponse::success($claim, "success update claim data");
@@ -136,5 +165,38 @@ class ClaimController extends Controller
 
         // return list by json response with ApiResponse class
         return ApiResponse::success($claims, "success get claims data");
+    }
+
+    // create function to approve claim data based on Models/Claim.php
+    // return approved claim data by json response with ApiResponse class
+    public function approval(Request $request, string $id)
+    {
+        // get claim data based on id
+        $claim = Claim::find($id);
+
+        // if claim data not found, return error response with ApiResponse class
+        if (!$claim) {
+            return ApiResponse::error("claim data not found", 404);
+        }
+
+        if ($request->has('isHr')) {
+            $data['is_approve_personalia'] = $request->status;
+            $data['approve_personalia_by'] = Auth::user()->id;
+            $data['approve_personalia_at'] = now();
+        } elseif ($request->has('isFa')) {
+            $data['is_approve_fa'] = $request->status;
+            $data['approve_fa_by'] = Auth::user()->id;
+            $data['approve_fa_at'] = now();
+        } else {
+            $data['is_approve_supervisor'] = $request->status;
+            $data['approve_supervisor_by'] = Auth::user()->id;
+            $data['approve_supervisor_at'] = now();
+        }
+
+        // update claim data status to approved
+        $claim->update($data);
+
+        // return approved claim data by json response with ApiResponse class
+        return ApiResponse::success($claim, "success approve claim data");
     }
 }

@@ -24,4 +24,32 @@ class Permission extends Model
     {
         return $this->hasOne(PermissionDate::class, "permission_id", "id");
     }
+
+    // relation to PermissionDocument
+    public function PermissionDocument(): HasOne
+    {
+        return $this->hasOne(PermissionDocument::class, "permission_id", "id");
+    }
+
+    // create relation to user by supervisor_approval_by column
+    public function SupervisorApproval(): HasOne
+    {
+        return $this->hasOne(User::class, "id", "supervisor_approval_by");
+    }
+
+    public function PersonaliaApproval(): HasOne
+    {
+        return $this->hasOne(User::class, "id", "personalia_approval_by");
+    }
+
+    public function FaApproval(): HasOne
+    {
+        return $this->hasOne(User::class, "id", "fa_approval_by");
+    }
+
+    // relation to user
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class, "id", "user_id");
+    }
 }

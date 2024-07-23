@@ -21,9 +21,10 @@ class PermissionController extends Controller
         $user_id = Auth()->user()->id;
         $page = $request->query('page', 1);
 
-        // Fetch divisions with pagination and search
-        $permission = Permission::with("PermissionDate")->where("user_id", "=", $user_id)
-                        ->orderBy("id", "DESC")
+        // Fetch permissions with pagination and search
+        $permission = Permission::with(["PermissionDate", "PermissionDocument"])
+                        ->where("permissions.user_id", "=", $user_id)
+                        ->orderBy("permissions.id", "DESC")
                         ->paginate(10, ['*'], 'page', $page);
 
         return ApiResponse::success($permission, "success get data permission", 200);
@@ -146,5 +147,43 @@ class PermissionController extends Controller
                         ->paginate(10, ['*'], 'page', $page);
 
         return ApiResponse::success($permission, "success get data permission", 200);
+    }
+
+    public function approval_list(Request $request)
+    {
+        $page = $request->query('page', 1);
+
+        // Fetch divisions with pagination and search
+        $permission = Permission::with(["PermissionDate", "User", "PermissionDocument", "SupervisorApproval", "PersonaliaApproval", "FaApproval"])
+            ->when($request->search, function ($query) use ($request) {
+            $query->whereHas('User', function ($subQuery) use ($request) {
+                $subQuery->where('name', 'like', '%' . $request->search . '%');
+            });
+            })
+            ->orderBy("id", "DESC")
+            ->paginate(10, ['*'], 'page', $page);
+
+        return ApiResponse::success($permission, "success get data permission", 200);
+    }
+
+    public function approval(Request $request)
+    {
+        $request->validate([
+            "status" => "required|in:1,2",
+            "ids" => "required|array",
+            "ids.*" => "required|exists:permissions,id"
+        ]);
+
+        $permissionIds = $request->ids;
+        $permissions = Permission::whereIn('id', $permissionIds)->get();
+
+        foreach ($permissions as $permission) {
+            $permission->supervisor_approval = $request->status;
+            $permission->supervisor_approval_date = date("Y-m-d H:i:s");
+            $permission->supervisor_approval_by = Auth()->user()->id;
+            $permission->save();
+        }
+
+        return ApiResponse::success(null, "success bulk approval permission", 200);
     }
 }
