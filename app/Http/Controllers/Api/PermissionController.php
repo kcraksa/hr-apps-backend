@@ -20,12 +20,13 @@ class PermissionController extends Controller
     {
         $user_id = Auth()->user()->id;
         $page = $request->query('page', 1);
+        $limit = $request->query('limit', 10);
 
         // Fetch permissions with pagination and search
         $permission = Permission::with(["PermissionDate", "PermissionDocument"])
                         ->where("permissions.user_id", "=", $user_id)
                         ->orderBy("permissions.id", "DESC")
-                        ->paginate(10, ['*'], 'page', $page);
+                        ->paginate($limit, ['*'], 'page', $page);
 
         return ApiResponse::success($permission, "success get data permission", 200);
     }
@@ -152,6 +153,7 @@ class PermissionController extends Controller
     public function approval_list(Request $request)
     {
         $page = $request->query('page', 1);
+        $limit = $request->query('limit', 10);
 
         // Fetch divisions with pagination and search
         $permission = Permission::with(["PermissionDate", "User", "PermissionDocument", "SupervisorApproval", "PersonaliaApproval", "FaApproval"])
@@ -161,7 +163,7 @@ class PermissionController extends Controller
             });
             })
             ->orderBy("id", "DESC")
-            ->paginate(10, ['*'], 'page', $page);
+            ->paginate($limit, ['*'], 'page', $page);
 
         return ApiResponse::success($permission, "success get data permission", 200);
     }

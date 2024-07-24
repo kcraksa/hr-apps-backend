@@ -156,7 +156,8 @@ Route::prefix("v1")->group(function() {
         Route::post("/claim", [ClaimController::class, "store"]);
         Route::put("/claim/{id}", [ClaimController::class, "update"]);
         Route::delete("/claim/{id}", [ClaimController::class, "delete"]);
-        Route::post("/approval/claim/{id}", [ClaimController::class, "approval"]);
+        Route::get("/approval/claim/list", [ClaimController::class, "approval_list"]);
+        Route::post("/approval/claim", [ClaimController::class, "approval"]);
 
         // Evaluation
         Route::get("/evaluations", [EvaluationController::class, "index"]);
@@ -168,6 +169,8 @@ Route::prefix("v1")->group(function() {
         Route::get("/attend-problem/{id}", [AttendProblemController::class, "show"]);
         Route::put("/attend-problem/{id}", [AttendProblemController::class, "update"]);
         Route::delete("/attend-problem/{id}", [AttendProblemController::class, "destroy"]);
+        Route::get("/approval/attend-problem/list", [AttendProblemController::class, "approval_list"]);
+        Route::post("/approval/attend-problem", [AttendProblemController::class, "approval"]);
     });
 
     Route::middleware(['auth:sanctum', 'abilities:email-verification'])->group(function() {  

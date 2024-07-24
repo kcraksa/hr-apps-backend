@@ -23,9 +23,11 @@ class ClaimController extends Controller
         // get dynamic values for page and total paginated data
         $page = $request->query('page', 1);
         $perPage = $request->query('perPage', 10);
+        $user = Auth::user()->id;
 
         // get list of claims data based on search query
         $claims = Claim::with(['user', 'attachments'])
+            ->where('user_id', $user)
             ->whereHas('user', function ($query) use ($search) {
                 $query->where('name', 'like', "%$search%");
             })
@@ -167,34 +169,67 @@ class ClaimController extends Controller
         return ApiResponse::success($claims, "success get claims data");
     }
 
+    // create function to get list of claims data based on Models/Claim.php and joined with Users table,
+    // the list must be paginated and sorted by latest created_at and can filtered by search query
+    // return list by json response with ApiResponse class
+    public function approval_list(Request $request)
+    {
+        // get search query from request
+        $search = $request->query('search');
+        
+        // get dynamic values for page and total paginated data
+        $page = $request->query('page', 1);
+        $limit = $request->query('limit', 10);
+
+        // get list of claims data based on search query
+        $claims = Claim::with(['user', 'attachments'])
+            ->whereHas('user', function ($query) use ($search) {
+                $query->where('name', 'like', "%$search%");
+            })
+            ->orWhere('description', 'like', "%$search%")
+            ->orderBy('created_at', 'desc')
+            ->paginate($limit, ['*'], 'page', $page);
+
+        // return list by json response with ApiResponse class
+        return ApiResponse::success($claims, "success get claims data");
+    }
+
     // create function to approve claim data based on Models/Claim.php
     // return approved claim data by json response with ApiResponse class
-    public function approval(Request $request, string $id)
+    public function approval(Request $request)
     {
-        // get claim data based on id
-        $claim = Claim::find($id);
+        // validate request data
+        $request->validate([
+            'status' => 'required|in:1,2',
+            'ids' => 'required|array',
+            'ids.*' => 'required|exists:claims,id'
+        ]);
+        $ids = $request->ids;
 
-        // if claim data not found, return error response with ApiResponse class
-        if (!$claim) {
-            return ApiResponse::error("claim data not found", 404);
-        }
+        $data = [];
+        $status = $request->status;
+        $userId = Auth::user()->id;
 
         if ($request->has('isHr')) {
-            $data['is_approve_personalia'] = $request->status;
-            $data['approve_personalia_by'] = Auth::user()->id;
+            $data['is_approve_personalia'] = $status;
+            $data['approve_personalia_by'] = $userId;
             $data['approve_personalia_at'] = now();
         } elseif ($request->has('isFa')) {
-            $data['is_approve_fa'] = $request->status;
-            $data['approve_fa_by'] = Auth::user()->id;
+            $data['is_approve_fa'] = $status;
+            $data['approve_fa_by'] = $userId;
             $data['approve_fa_at'] = now();
         } else {
-            $data['is_approve_supervisor'] = $request->status;
-            $data['approve_supervisor_by'] = Auth::user()->id;
+            $data['is_approve_supervisor'] = $status;
+            $data['approve_supervisor_by'] = $userId;
             $data['approve_supervisor_at'] = now();
         }
 
         // update claim data status to approved
-        $claim->update($data);
+        Claim::whereIn('id', $ids)->update($data);
+
+        // get the updated claim data
+        $claim = Claim::whereIn('id', $ids)->get();
+
 
         // return approved claim data by json response with ApiResponse class
         return ApiResponse::success($claim, "success approve claim data");
