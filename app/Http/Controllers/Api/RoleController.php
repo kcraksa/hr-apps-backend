@@ -29,22 +29,29 @@ class RoleController extends Controller
 
     public function searchEmployee(Request $request)
     {
-        $data = Employee::with(['User' => function($query) use ($request) {
-            $query->where('name', '=', $request->search)
-                  ->orWhere('nip', '=', $request->search);
-        }])->first();
-        $roleAssigned = Role::with("FunctionModule")->where("user_id", $data->user->id)->get();
+        $data = Employee::with("User")
+            ->whereHas("User", function ($query) use ($request) {
+                $query->where("nip", "=", $request->search)
+                    ->orWhere("name", "=", $request->search);
+            })
+            ->first();
 
-        $functionNames = [];
-        foreach ($roleAssigned as $item) {
-            $functionNames[] = $item->FunctionModule->name;
+        if (!$data || $data == null) {
+            return ApiResponse::error("Employee not found", 404);
+        } else {
+            $roleAssigned = Role::with("FunctionModule")->where("user_id", $data->user->id)->get();
+
+            $functionNames = [];
+            foreach ($roleAssigned as $item) {
+                $functionNames[] = $item->FunctionModule->name;
+            }
+
+            $data->role_assigned = count($roleAssigned);
+            $data->function = $functionNames;
+            $data->roles = $this->getUserRoleByUserId($data->user->id);
+
+            return ApiResponse::success($data, "Get data employee success", 200);
         }
-
-        $data->role_assigned = count($roleAssigned);
-        $data->function = $functionNames;
-        $data->roles = $this->getUserRoleByUserId($data->user->id);
-
-        return ApiResponse::success($data, "Get data employee success", 200);
     }
 
     public function createFunction(Request $request)

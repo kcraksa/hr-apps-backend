@@ -49,7 +49,7 @@ class PermissionController extends Controller
         ]);
 
         $time = "00:00";
-        if ($request->time) {
+        if ($request->has("time")) {
             $time = $request->time;
         }
 
@@ -57,18 +57,35 @@ class PermissionController extends Controller
         $check = Permission::where('type', $request->type)
                     ->where('category', $request->category)
                     ->where('user_id', $request->user_id)
-                    ->where('status', 0)
-                    ->whereHas('permissionDate', function ($query) use ($request) {
-                        $query->where('fromdatetime', $request->date)
-                            ->where('todatetime', $request->date);
+                    ->whereHas('permissionDate', function ($query) use ($request, $time) {
+                        if ($request->type === "Overtime" || $request->type === "Permission" || $request->type === "Absent" || $request->type === "Sick Leave") {
+                            $query->where('fromdatetime', $request->fromdatetime)
+                                ->where('todatetime', $request->todatetime);
+                        } else {
+                            $query->where('fromdatetime', $request->date." ".$time)
+                                ->where('todatetime', $request->date." ".$time);
+                        }
                     })
-                    ->with(['permissionDate' => function ($query) use ($request) {
-                        $query->where('fromdatetime', $request->date)
-                            ->where('todatetime', $request->date);
-                    }])
+                    // ->with(['permissionDate' => function ($query) use ($request) {
+                    //     $query->where('fromdatetime', $request->date)
+                    //         ->where('todatetime', $request->date);
+                    // }])
                     ->exists();
         if ($check) {
             return ApiResponse::error("You have permission request on the date", 422);
+        }
+
+        // $leaveDays is from diff fromdatetime and todatetime
+        $leaveDays = 0;
+        if ($request->type === "Overtime" || $request->type === "Permission" || $request->type === "Absent" || $request->type === "Sick Leave") {
+            $leaveDays = GeneralHelper::datediff($request->fromdatetime, $request->todatetime);
+        } else {
+            $leaveDays = 1;
+        }
+        $result = UserLeaveData::handleLeaveRequest($request->user_id, $leaveDays);
+
+        if (isset($result['error'])) {
+            return ApiResponse::error($result['error'], 400);
         }
 
         // input request
@@ -76,8 +93,7 @@ class PermissionController extends Controller
             "user_id" => $request->user_id,
             "type" => $request->type,
             "category" => $request->category,
-            "reason" => $request->reason,
-            "status" => 0
+            "reason" => $request->reason
         ]);
 
         if ($request->type === "Overtime") {
@@ -93,9 +109,10 @@ class PermissionController extends Controller
             "datediff" => 0
         ]);
 
-        if ($request->type === "Overtime") {
-            $permissionDate->fromdatetime = $request->date." ".$request->time_from;
-            $permissionDate->todatetime = $request->date." ".$request->time_to;
+        if ($request->type === "Overtime" || $request->type === "Permission" || $request->type === "Absent" || $request->type === "Sick Leave") {
+            $permissionDate->fromdatetime = date("Y-m-d H:i", strtotime($request->fromdatetime));
+            $permissionDate->todatetime = date("Y-m-d H:i", strtotime($request->todatetime));
+            $permissionDate->datediff = GeneralHelper::datediff($request->fromdatetime, $request->todatetime);
             $permissionDate->save();
         }
 

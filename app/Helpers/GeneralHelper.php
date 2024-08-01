@@ -24,4 +24,11 @@ class GeneralHelper
 
 		return $data;
 	}
+
+	// create function dateDiff
+	public static function dateDiff($date1, $date2)
+	{
+		$diff = strtotime($date2) - strtotime($date1);
+		return abs(round($diff / 86400));
+	}
 }

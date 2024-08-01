@@ -53,7 +53,7 @@ class MasterLeaveController extends Controller
     public function updateLeaveBalance(Request $request, string $id) 
     {
         $request->validate([
-            'adjust_type' => 'required|in:addition,subtract',
+            'adjust_type' => 'required|in:addition,subtraction',
             'adjust_balance' => 'required',
             'year' => 'required'
         ]);
@@ -85,7 +85,7 @@ class MasterLeaveController extends Controller
     public function updateHealthBalance(Request $request, string $id) 
     {
         $request->validate([
-            'adjust_type' => 'required|in:addition,subtract',
+            'adjust_type' => 'required|in:addition,subtraction',
             'adjust_balance' => 'required',
             'year' => 'required'
         ]);
