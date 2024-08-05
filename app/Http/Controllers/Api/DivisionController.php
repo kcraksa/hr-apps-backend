@@ -20,7 +20,7 @@ class DivisionController extends Controller
         $divisions = Division::with(["Directorate"])->when($search, function($query, $search) {
                         return $query->where('name', 'LIKE', "%{$search}%");
                     })
-                    ->paginate(10, ['*'], 'page', $page);
+                    ->where('directorate_id', $request->query('businessUnitId'))->get();
 
         return ApiResponse::success($divisions, "success get data division", 200);
     }

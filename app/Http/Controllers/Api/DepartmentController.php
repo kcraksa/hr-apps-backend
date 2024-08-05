@@ -20,7 +20,8 @@ class DepartmentController extends Controller
         $departments = Department::with(["Division"])->when($search, function($query, $search) {
                         return $query->where('name', 'LIKE', "%{$search}%");
                     })
-                    ->paginate(10, ['*'], 'page', $page);
+                    ->where('division_id', $request->query('division_id'))->get();
+                    // ->paginate(10, ['*'], 'page', $page);
 
         return ApiResponse::success($departments, "success get data department", 200);
     }

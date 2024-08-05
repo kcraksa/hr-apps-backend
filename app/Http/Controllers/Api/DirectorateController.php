@@ -17,10 +17,7 @@ class DirectorateController extends Controller
         $page = $request->query('page', 1);
 
         // Fetch divisions with pagination and search
-        $data = Directorate::with(["Company"])->when($search, function($query, $search) {
-                        return $query->where('name', 'LIKE', "%{$search}%");
-                    })
-                    ->paginate(10, ['*'], 'page', $page);
+        $data = Directorate::with(["Company"])->where("company_id", $request->query('company_id'))->get();
 
         return ApiResponse::success($data, "success get data business unit", 200);
     }
