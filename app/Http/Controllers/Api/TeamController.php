@@ -19,8 +19,7 @@ class TeamController extends Controller
         // Fetch divisions with pagination and search
         $data = Team::when($search, function($query, $search) {
                         return $query->where('name', 'LIKE', "%{$search}%");
-                    })
-                    ->paginate(10, ['*'], 'page', $page);
+                    })->where('section_id', $request->section_id)->get();
 
         return ApiResponse::success($data, "success get data team", 200);
     }
@@ -39,10 +38,11 @@ class TeamController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required'
+            'name' => 'required',
+            'section_id' => 'required'
         ]);
 
-        $div = Team::create(["name" => $request->name]);
+        $div = Team::create(["name" => $request->name, "section_id" => $request->section_id]);
         return ApiResponse::success($div, "success create new team", 201);
     }
 

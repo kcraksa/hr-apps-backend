@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Company extends Model
 {
@@ -20,6 +21,11 @@ class Company extends Model
         "district_id",
         "status"
     ];
+
+    public function Directorate(): HasMany
+    {
+        return $this->hasMany(Directorate::class, "company_id", "id");
+    }
 
     public function District(): HasOne
     {

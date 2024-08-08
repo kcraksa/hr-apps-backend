@@ -15,7 +15,7 @@ class CompanyController extends Controller
 {
     public function index(Request $request)
     {
-        $data = Company::with("District")->where("name", "like", "%".$request->search."%")->get();
+        $data = Company::with(["District", "Directorate"])->where("name", "like", "%".$request->search."%")->get();
         return ApiResponse::success($data, "Success get data company", 200);
     }
 

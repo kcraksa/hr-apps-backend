@@ -17,7 +17,7 @@ class DepartmentController extends Controller
         $page = $request->query('page', 1);
 
         // Fetch departments with pagination and search
-        $departments = Department::with(["Division"])->when($search, function($query, $search) {
+        $departments = Department::with(["Division", "Section"])->when($search, function($query, $search) {
                         return $query->where('name', 'LIKE', "%{$search}%");
                     })
                     ->where('division_id', $request->query('division_id'))->get();

@@ -17,7 +17,7 @@ class SectionController extends Controller
         $page = $request->query('page', 1);
 
         // Fetch sections with pagination and search
-        $sections = Section::with(["Department"])->when($search, function($query, $search) {
+        $sections = Section::with(["Department", "Team"])->when($search, function($query, $search) {
                         return $query->where('name', 'LIKE', "%{$search}%");
                     })
                     ->paginate(10, ['*'], 'page', $page);

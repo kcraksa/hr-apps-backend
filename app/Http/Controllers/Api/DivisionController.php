@@ -17,7 +17,7 @@ class DivisionController extends Controller
         $page = $request->query('page', 1);
 
         // Fetch divisions with pagination and search
-        $divisions = Division::with(["Directorate"])->when($search, function($query, $search) {
+        $divisions = Division::with(["Directorate", "Department"])->when($search, function($query, $search) {
                         return $query->where('name', 'LIKE', "%{$search}%");
                     })
                     ->where('directorate_id', $request->query('businessUnitId'))->get();
