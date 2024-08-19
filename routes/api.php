@@ -71,6 +71,7 @@ Route::prefix("v1")->group(function() {
 
         // Company
         Route::get("/company", [CompanyController::class, "index"]);
+        Route::get("/company/{id}", [CompanyController::class, "show"]);
         Route::post("/company", [CompanyController::class, "create"]);
         Route::patch("/update-status/{code}", [CompanyController::class, "updateStatus"]);
         Route::delete("/company/{code}", [CompanyController::class, "delete"]);

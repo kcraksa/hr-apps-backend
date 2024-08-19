@@ -62,15 +62,24 @@ class CompanyController extends Controller
         return ApiResponse::success(null, "success create new company", 201);
     }
 
+    // get company
+    public function show(string $id)
+    {
+        $data = Company::with(["District", "Directorate"])->where("id", $id)->first();
+        // throw error if not found
+        if (!$data) {
+            return ApiResponse::error("Company not found", 404);
+        }
+        return ApiResponse::success($data, "Success get data company", 200);
+    }
+
     public function updateStatus(Request $request, string $company)
     {
         $request->validate([
             'status' => 'required'
         ]);
 
-        $company = Company::where("id", $company);
-        $company->status = $request->status;
-        $company->save();
+        $company = Company::where("id", $company)-update(["status" => $request->status]);
 
         return ApiResponse::success(null, "Success update status company", 200);
     }
